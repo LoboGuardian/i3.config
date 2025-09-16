@@ -76,10 +76,11 @@ sudo dnf install alacritty blueman scrot picom rofi clipman dunst redshift bluem
 - `Super + F5`: File manager
 - `Super + F6`: Audio control
 - `Super + F7`: Application launcher
-- `Super + F8/F9`: Switch to workspace 8/9
-- `Super + F10`: Lock screen
-- `Super + F11`: Fullscreen toggle
-- `Super + F12`: Power menu
+- `Super + F8/F9`: Lock screen
+- `Super + F8/F9`: Switch to workspace 9
+- `Super + F10`: Power menu
+- `Super + F11`: None
+- `Super + F12`: None
 
 ### Workspace Management
 - `Super + 1-0`: Switch to workspace 1-10
