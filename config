@@ -217,6 +217,8 @@ bindsym $mod+Shift+Ctrl+q [workspace="__focused__"] kill
 bindsym $mod+x [urgent=latest] focus
 
 # Application-specific workspace assignments
+assign [class="i3-sensible-terminal"] $ws1
+assign [class="xfce4-terminal"] $ws1
 assign [class="firefox"] $ws2
 assign [class="Microsoft-edge"] $ws3
 assign [class="Zed"] $ws4
@@ -225,10 +227,10 @@ assign [class="Spotify"] $ws6
 assign [class="discord"] $ws7
 assign [class="Slack"] $ws7
 assign [class="TelegramDesktop"] $ws7
-assign [class="LibreOffice"] $ws9
+assign [class="libreoffice"] $ws9
 assign [class="Evince"] $ws9
 assign [class="Gnome-system-monitor"] $ws10
-assign [class="Pavucontrol"] $ws10
+assign [class="pavucontrol"] $ws10
 
 # Floating windows for specific applications
 for_window [class="Arandr"] floating enable
@@ -452,7 +454,7 @@ bindsym $mod+Ctrl+o mode $rotate_mode
 # Touchpad toggle (si usas mouse externo)
 bindsym $mod+Ctrl+t exec --no-startup-id "xinput --list | grep -i touchpad | grep -o 'id=[0-9]*' | cut -d= -f2 | xargs -I{} xinput toggle {}"
 
-# Chromebook-specific key bindings (alternative approach without xdotool)
+# Chromebook-specific key bindings
 # Quick application launchers (more useful than function keys)
 bindsym $mod+F1 exec --no-startup-id i3-sensible-terminal
 bindsym $mod+F2 exec --no-startup-id firefox
@@ -461,11 +463,14 @@ bindsym $mod+F4 exec --no-startup-id zed
 bindsym $mod+F5 exec --no-startup-id thunar
 bindsym $mod+F6 exec --no-startup-id pavucontrol
 bindsym $mod+F7 exec --no-startup-id "dmenu_run -nf '$numix_light_gray' -nb '$numix_dark_gray' -sb '$numix_orange' -sf '$numix_white' -fn 'DejaVu Sans Mono-10'"
-bindsym $mod+F8 workspace 8
+bindsym $mod+F8 exec --no-startup-id i3lock
 bindsym $mod+F9 workspace 9
-bindsym $mod+F10 exec --no-startup-id i3lock
-bindsym $mod+F11 fullscreen toggle
-bindsym $mod+F12 mode $power_mode
+bindsym $mod+F10 mode $power_mode
+# bindsym $mod+F11 none
+# bindsym $mod+F12 none
+
+# Another for power mode
+bindsym $mod+Shift+p mode $power_mode
 
 # Modo de sistema para configuraciones rápidas
 # set $system_mode "System: (w)ifi, (b)luetooth, (a)udio, (d)isplay, (p)ower, (n)etwork"
