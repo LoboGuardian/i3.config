@@ -12,10 +12,10 @@
 # Please see https://i3wm.org/docs/userguide.html for a complete reference!
 #
 # REQUIRED PACKAGES (Fedora):
-# sudo dnf install brightnessctl libnotify
+# sudo dnf install brightnessctl libnotify thunar pavucontrol
 #
 # Optional packages:
-# sudo dnf install alacritty thunar pavucontrol blueman scrot picom
+# sudo dnf install alacritty blueman scrot picom rofi clipman dunst redshift blueman-applet
 
 set $mod Mod4
 
@@ -171,11 +171,10 @@ set $ws3 "3:Edge"
 set $ws4 "4:Code"
 set $ws5 "5:Files"
 set $ws6 "6:Media"
-set $ws7 "7"
-set $ws8 "8"
-set $ws9 "9"
+set $ws7 "7:Chat"
+set $ws8 "8:Work"
+set $ws9 "9:Docs"
 set $ws10 "10:Settings"
-
 
 # switch to workspace
 bindsym $mod+1 workspace number $ws1
@@ -201,11 +200,35 @@ bindsym $mod+Shift+8 move container to workspace number $ws8
 bindsym $mod+Shift+9 move container to workspace number $ws9
 bindsym $mod+Shift+0 move container to workspace number $ws10
 
+# Alternar entre layouts útiles
+bindsym $mod+Ctrl+1 layout splith; exec notify-send "Layout" "Horizontal"
+bindsym $mod+Ctrl+2 layout splitv; exec notify-send "Layout" "Vertical"
+bindsym $mod+Ctrl+3 layout stacking; exec notify-send "Layout" "Stacking"
+bindsym $mod+Ctrl+4 layout tabbed; exec notify-send "Layout" "Tabbed"
+
+# Mover ventanas entre monitores (preparado para dual monitor)
+bindsym $mod+Shift+greater move container to output right
+bindsym $mod+Shift+less move container to output left
+
+# Kill all en workspace actual
+bindsym $mod+Shift+Ctrl+q [workspace="__focused__"] kill
+
+# Focus urgent window
+bindsym $mod+x [urgent=latest] focus
+
 # Application-specific workspace assignments
 assign [class="firefox"] $ws2
 assign [class="Microsoft-edge"] $ws3
 assign [class="Zed"] $ws4
 assign [class="Thunar"] $ws5
+assign [class="Spotify"] $ws6
+assign [class="discord"] $ws7
+assign [class="Slack"] $ws7
+assign [class="TelegramDesktop"] $ws7
+assign [class="LibreOffice"] $ws9
+assign [class="Evince"] $ws9
+assign [class="Gnome-system-monitor"] $ws10
+assign [class="Pavucontrol"] $ws10
 
 # Floating windows for specific applications
 for_window [class="Arandr"] floating enable
@@ -214,6 +237,17 @@ for_window [class="Blueman-manager"] floating enable
 for_window [title="^Open File$"] floating enable
 for_window [window_role="pop-up"] floating enable
 for_window [window_role="task_dialog"] floating enable
+for_window [class="Pinentry"] floating enable
+for_window [class="Gpick"] floating enable
+for_window [class="Lxappearance"] floating enable
+
+# Focus automático para aplicaciones críticas
+for_window [class="firefox" urgent=latest] focus
+for_window [class="Zed" urgent=latest] focus
+
+# Tamaños específicos para aplicaciones flotantes
+for_window [class="Gnome-calculator"] floating enable, resize set 350 450, move position center
+for_window [class="Nm-connection-editor"] floating enable, resize set 600 400, move position center
 
 # reload the configuration file
 bindsym $mod+Shift+c reload
@@ -222,6 +256,20 @@ bindsym $mod+Shift+r restart
 # exit i3 (logs you out of your X session)
 # bindsym $mod+Shift+e exec "i3-nagbar -t warning -m 'You pressed the exit shortcut. Do you really want to exit i3? This will end your X session.' -B 'Yes, exit i3' 'i3-msg exit'"
 bindsym $mod+Shift+e exec "i3-nagbar -t warning -m 'Exit i3? This will end your X session.' -B 'Yes, exit i3' 'i3-msg exit' -f 'pango:DejaVu Sans Mono 10'"
+
+# Abrir archivo/directorio rápido
+# bindsym $mod+Ctrl+o exec --no-startup-id "thunar ~/Downloads"
+bindsym $mod+Ctrl+h exec --no-startup-id "thunar ~/"
+bindsym $mod+Ctrl+d exec --no-startup-id "thunar ~/Documents"
+
+# Terminal en directorio específico
+bindsym $mod+Shift+Return exec --no-startup-id "cd ~/Downloads && i3-sensible-terminal"
+
+# Editor rápido de config
+bindsym $mod+Shift+Ctrl+c exec --no-startup-id "zed ~/.config/i3/config"
+
+# Lockscreen con timer
+bindsym $mod+Ctrl+l exec --no-startup-id "notify-send 'Locking in 3 seconds...' && sleep 3 && i3lock"
 
 # Power management menu
 set $power_mode "Power: (l)ock, (e)xit, (s)uspend, (h)ibernate, (r)eboot, (p)oweroff"
@@ -323,6 +371,12 @@ bar {
     status_command i3status
     position top
     strip_workspace_numbers yes
+    separator_symbol " | "
+    workspace_buttons yes
+    binding_mode_indicator yes
+
+    # Mostrar números de workspace
+    # strip_workspace_numbers no
 
     colors {
         background $numix_dark_gray
@@ -336,7 +390,7 @@ bar {
         binding_mode       $numix_blue $numix_blue $numix_white
     }
 
-    # Optional: Show tray icons
+    # Show tray icons
     tray_output primary
     tray_padding 2
 }
@@ -346,6 +400,16 @@ workspace_auto_back_and_forth yes
 
 # Window focus follows mouse (optional - comment out if you prefer click-to-focus)
 focus_follows_mouse yes
+
+# Alt+Tab simulado
+bindsym Mod1+Tab focus right
+bindsym Mod1+Shift+Tab focus left
+
+# Workspace navigation más fluida
+bindsym $mod+Ctrl+Right workspace next
+bindsym $mod+Ctrl+Left workspace prev
+bindsym $mod+Ctrl+Shift+Right move container to workspace next; workspace next
+bindsym $mod+Ctrl+Shift+Left move container to workspace prev; workspace prev
 
 # Language switching mode
 set $lang_mode "Language: (e)nglish, (s)panish"
@@ -361,6 +425,33 @@ bindsym $mod+i mode $lang_mode
 # Quick language toggle (Alt+Shift to switch between last two layouts)
 bindsym $mod+Shift+i exec --no-startup-id "setxkbmap -query | grep -q 'layout:.*us' && setxkbmap -layout es || setxkbmap -layout us -variant altgr-intl"
 
+# Rotación de pantalla (útil para algunos usos)
+bindsym $mod+Ctrl+r exec --no-startup-id "xrandr --output eDP-1 --rotate normal && notify-send 'Screen' 'Normal rotation'"
+bindsym $mod+Ctrl+Shift+r exec --no-startup-id "xrandr --output eDP-1 --rotate left && notify-send 'Screen' 'Rotated left'"
+
+# Rotaciones adicionales
+bindsym $mod+Ctrl+Shift+l exec --no-startup-id "xrandr --output eDP-1 --rotate right && notify-send 'Screen' 'Rotated right'"
+bindsym $mod+Ctrl+Shift+u exec --no-startup-id "xrandr --output eDP-1 --rotate inverted && notify-send 'Screen' 'Upside down'"
+
+# Modo de rotación de pantalla
+set $rotate_mode "Rotate: (n)ormal, (l)eft, (r)ight, (u)pside down"
+mode $rotate_mode {
+    bindsym n exec --no-startup-id "xrandr --output eDP-1 --rotate normal", mode "default"
+    bindsym l exec --no-startup-id "xrandr --output eDP-1 --rotate left", mode "default"
+    bindsym r exec --no-startup-id "xrandr --output eDP-1 --rotate right", mode "default"
+    bindsym u exec --no-startup-id "xrandr --output eDP-1 --rotate inverted", mode "default"
+
+    bindsym Return mode "default"
+    bindsym Escape mode "default"
+}
+bindsym $mod+Ctrl+o mode $rotate_mode
+
+# Gestor de energía más inteligente
+# exec --no-startup-id "xset dpms 300 600 900" # Pantalla off después de inactividad
+
+# Touchpad toggle (si usas mouse externo)
+bindsym $mod+Ctrl+t exec --no-startup-id "xinput --list | grep -i touchpad | grep -o 'id=[0-9]*' | cut -d= -f2 | xargs -I{} xinput toggle {}"
+
 # Chromebook-specific key bindings (alternative approach without xdotool)
 # Quick application launchers (more useful than function keys)
 bindsym $mod+F1 exec --no-startup-id i3-sensible-terminal
@@ -375,6 +466,35 @@ bindsym $mod+F9 workspace 9
 bindsym $mod+F10 exec --no-startup-id i3lock
 bindsym $mod+F11 fullscreen toggle
 bindsym $mod+F12 mode $power_mode
+
+# Modo de sistema para configuraciones rápidas
+# set $system_mode "System: (w)ifi, (b)luetooth, (a)udio, (d)isplay, (p)ower, (n)etwork"
+# mode $system_mode {
+#     bindsym w exec --no-startup-id nm-connection-editor, mode "default"
+#     bindsym b exec --no-startup-id blueman-manager, mode "default"
+#     bindsym a exec --no-startup-id pavucontrol, mode "default"
+#     bindsym d exec --no-startup-id arandr, mode "default"
+#     bindsym p exec --no-startup-id xfce4-power-manager-settings, mode "default"
+#     bindsym n exec --no-startup-id "nmtui", mode "default"
+#
+#     bindsym Return mode "default"
+#     bindsym Escape mode "default"
+# }
+# bindsym $mod+Ctrl+s mode $system_mode
+
+# Modo de aplicaciones para lanzar apps específicas
+# set $apps_mode "Apps: (c)alculator, (t)op, (f)iles, (s)creenshot, (v)ideo"
+# mode $apps_mode {
+#     bindsym c exec --no-startup-id gnome-calculator, mode "default"
+#     bindsym t exec --no-startup-id "i3-sensible-terminal -e htop", mode "default"
+#     bindsym f exec --no-startup-id thunar, mode "default"
+#     bindsym s exec --no-startup-id "scrot -s", mode "default"
+#     bindsym v exec --no-startup-id vlc, mode "default"
+#
+#     bindsym Return mode "default"
+#     bindsym Escape mode "default"
+# }
+# bindsym $mod+Ctrl+a mode $apps_mode
 
 # Alternative window management (useful for small screens)
 bindsym $mod+Tab workspace back_and_forth
@@ -413,3 +533,14 @@ bindsym $mod+comma exec --no-startup-id "notify-send 'i3 Help' 'Super+F1-F12: Qu
 exec --no-startup-id "setxkbmap -layout us -variant altgr-intl" # International keyboard layout
 exec --no-startup-id "xset r rate 300 50" # Faster key repeat
 exec --no-startup-id "setxkbmap -option caps:escape" # Map Caps Lock to Escape (useful for vim/terminal)
+
+# Aplicaciones de inicio en background
+# exec_always --no-startup-id "pgrep -x dunst || dunst &"
+# exec_always --no-startup-id "pgrep -x redshift || redshift -l 9.0:-79.5 &"
+# exec --no-startup-id "setxkbmap -option grp:alt_shift_toggle us,es"
+
+# Restaurar layout al inicio
+# exec --no-startup-id "i3-msg 'workspace 1; layout splith'"
+
+# Auto-start aplicaciones en workspaces específicos después de delay
+# exec --no-startup-id "sleep 5 && i3-msg 'workspace 2; exec firefox' || true"
